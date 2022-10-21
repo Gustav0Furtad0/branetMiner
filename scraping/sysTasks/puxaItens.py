@@ -19,9 +19,11 @@ def itens(WEB):
             sleep(3)
             
         rows= WEB.driver.find_elements(By.XPATH, "/html/body/div[@id='div_principal']/div[@id='div_principal']/div[@id='conteudo_template']/span[@id='conteudo']/div[@id='panelPesquisa']/div[@id='panelPesquisa_content']/form[@id='lista']/div/div/table/tbody/tr")
-        for row in rows:
+        for ix, row in enumerate(rows):
+            if ((ix+1) % 500) == 0:
+                print("Extraindo item ", ix)
             cels = row.find_elements(By.TAG_NAME, 'td')
-            lista.append([cels[0].text, cels[1].text, cels[2].text, cels[5].text])
+            lista.append([cels[1].text, cels[2].text, cels[5].text])
 
         navigator = WEB.driver.find_element(By.XPATH, "/html/body/div[@id='div_principal']/div[@id='div_principal']/div[@id='conteudo_template']/span[@id='conteudo']/div[@id='panelPesquisa']/div[@id='panelPesquisa_content']/form[@id='lista']/div/div[1]/span[2]")
         navigator = navigator.find_elements(By.TAG_NAME, 'a')

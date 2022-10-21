@@ -13,13 +13,13 @@ table = ExTable();
 def listaCadItens(op):
     result = driver.puxaItens()
     if op:
-        table.tableItens(result)
+        table.tableItens(dataTable=result)
     else:
         for i in range(len(result)):
             print(result[i])
     
 def listaParamCatalog(op):
-    result = driver.puxaParamCatalog()
+    result = driver.puxaCatalogo()
     if op:
         table.tableItens(result)
     else:
@@ -27,4 +27,5 @@ def listaParamCatalog(op):
             print(result[i])
 
 def quit():
-    driver.quitDriver(driver)
+    del table
+    driver.quitDriver(driver) 

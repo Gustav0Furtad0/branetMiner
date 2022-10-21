@@ -1,13 +1,35 @@
+from ast import increment_lineno
 import openpyxl as opx
 from time import sleep
 
-def strtoArray()
+def strtoArray(str):
+    try:
+        str = str.replace(" ", "").split(",")
+        
+        array = []
+        
+        for n in str:
+            array.append(int(n))
+            
+        return array
+    
+    except ValueError:
+        return False
+        
+
+def avisoTabela(data):
+    print("Vale lembra que as colunas de dados são: ", end="")
+    for i, dado in enumerate(data):
+        if i != len(data)-1: 
+            print(f"{i} - {dado}, ", end="")
+        else:
+            print(f"{i} - {dado}")
 
 class ExTable():
     def __init__(self):
         self.arquivo = opx.Workbook()
         self.nome = None
-        self.arquivo.remove(self.arquivo.worksheets[0])
+        # self.arquivo.remove(self.arquivo.worksheets[0])
         
     def criaTabela(self, tnome):
         self.arquivo.create_sheet(tnome)
@@ -19,41 +41,61 @@ class ExTable():
     def tabelaAtiva(self):
         return self.arquivo.active.title
     
-    def addData(self, tabelaIx, columns, data, dataInner = False, conditions = False):
+    def linhasTabela(self, i):
+        tabela = self.arquivo[self.arquivo.sheetnames[i]]
+        return tabela.max_row
         
-        tabela = self.arquivo[self.arquivo.sheetnames[tabelaIx]]
-        
-        if conditions == False:
-            for ix, coluna in enumerate(columns):
-                for dado in range(len(data)):
-                    cel = tabela.cell(row=(dado+1), column=coluna)
-                    cel.value = data[dado][ix]
-        
-        else:
-            for indicedata, coluna in enumerate(columns):
-                for dado in range(len(data)):
-                    if ( str(data[dado][conditions[0]]) == str(tabela.cell(row=(dado+1), column=conditions[1]).value) ):
+    
+    def addData(self, tabelaIx, columns, data, dataInner = False, condition = False):
+        # try: 
+            tabela = self.arquivo[self.arquivo.sheetnames[tabelaIx]]
+            
+            if condition == False:
+                for ix, coluna in enumerate(columns):
+                    for dado in range(len(data)):
                         cel = tabela.cell(row=(dado+1), column=coluna)
-                        if dataInner == False:
-                            cel.value = data[dado][indicedata]
-                        else:
-                            cel.value = data[dado][dataInner[indicedata]]
+                        cel.value = data[dado][ix]
+            
+            else:
+                for dado in data:
+                    procuro = str(dado[condition[0]])
+                    i = 1
+                    while i <= tabela.max_row:
+                        celBusca = tabela.cell(row=i, column = condition[1])
+                        #print(celBusca.value , procuro)
+                        
+                        if ( procuro == str(celBusca.value) ):
+                            #if dataInner == False:
+                            for nColuna in range(len(columns)):
+                                print(dado[dataInner[nColuna]], end=' para = ')
+                                cel = tabela.cell(row=i, column=columns[nColuna])
+                                print(cel)
+                                cel.value = dado[dataInner[nColuna]]
+                            i = tabela.max_row
+                        
+                        i += 1
+    
+            return True
+        # except:
+        #     return False 
+                    
             
     def saveArchive(self):
         self.arquivo.save(filename=f"{self.nome}.xlsx")
         
     
     def tableItens(self, dataTable):
-        print(f"=_=_=_=_=_=_=_= TABELA PESONALIZADA {self.nome} =_=_=_=_=_=_=_=\n\n")
+        print(f"""                    =_=_=_=_=_=_=_= TABELA PESONALIZADA {self.nome} =_=_=_=_=_=_=_=\n""")
         data = dataTable
         while True:
             optext = f"""\n
                     --- Para fazer a manipulacao de arquivos escolha uma opcao abaixo ---
-                    Lista de tabelas: 
-                    """
-                    
-            for i, tbl in enumerate(self.tabelaAtiva()):
-                optext += f"\n{i} - {tbl}"
+                    Lista de tabelas: """
+            if (len(self.arquivo.sheetnames)) != 0:
+                for i, tbl in enumerate(self.listaTabelas()):
+                    optext += f"""\n                    {i} - {tbl}"""
+            else:
+                optext += "\nNenhuma tabela ativa"
                 
             optext +=f"""
                     \n
@@ -63,7 +105,7 @@ class ExTable():
                     [3] Listar areas de trabalho existentes
                     [4] Adicionar dados a uma tabela simples
                     [5] Adicionar dados condicionais a uma tabela
-                    [6] Salvar Arquivo
+                    [6] Salvar Arquivo (finaliza modificacoes)
                         
                     Rs:"""
             option = int(input(optext))
@@ -81,38 +123,41 @@ class ExTable():
                 case 3:
                     print(self.listaTabelas())
                     
-                case 4:
-                    
-                    tabelaIX = input("\nEscolha a tabela a ter dados inseridos: ")
-                    self.avisoTabela(dataTable[0])
-                    columns = lambda colunas = input("Digite as colunas onde quer inserir na ordem dos dados (',' entre elas): ") : colunas.replace(" ", "").split(",")
-
-                    for col in columns:
-                        columns[col] = int(col)
-                    
-                    self.addData( tabelaIx = tabelaIX, columns = columns, data = data)
+                case 4: 
+                    try:
+                        tabelaIX = int(input("\nEscolha a tabela a ter dados inseridos: ").replace(" ", ""))
+                        
+                        avisoTabela(dataTable[0])
+                        
+                        columns = input("Digite as colunas onde quer inserir na ordem dos dados (',' entre elas): ")
+                        columns = strtoArray(columns)
+                        
+                        self.addData( tabelaIx = tabelaIX, columns = columns, data = data)
+                    except:
+                        print("Algum dado foi inserido da forma incorreta ou houve um erro desconhecido, refaca o processo")
+                        sleep(4)
+                        
                     
                 case 5:
-                    tabelaIX = input("\nEscolha a tabela a ter dados inseridos: ")
-                    
-                    columns = lambda colunas = input("Digite as colunas onde quer inserir na ordem dos dados (',' entre elas): ") : colunas.replace(" ", "").split(",")
-                    
-                    for col in columns:
-                        columns[col] = int(col)
+                    # try:
+                        tabelaIX = int(input("\nEscolha a tabela a ter dados inseridos: ").replace(" ", ""))
                         
-                    conditions = input("['dados extraido indice', 'coluna indice'] analisar dado e coluna (',' entre elas): ")
-                    for col in conditions:
-                        columns[col] = int(col)
-                    
-                    self.addData( tabelaIx = tabelaIX, columns = columns, data = data, conditions = False, dataInner = False)
+                        avisoTabela(dataTable[0])
+                        
+                        dataInner = input("Digite o índice dos dados a serem inseridos na tabela (',' entre eles): ")
+                        dataInner = strtoArray(dataInner)
+                        
+                        columns = input("Digite as colunas onde quer inserir na ordem dos dados que quer inserir (',' entre elas): ")
+                        columns = strtoArray(columns)
+                        
+                        conditions = input("['dados extraido indice', 'coluna indice'] analisar dado e coluna (',' entre elas): ")
+                        conditions = strtoArray(conditions)
+                        
+                        if(not ( self.addData( tabelaIx = tabelaIX, columns = columns, data = data, condition = conditions, dataInner = dataInner) ) ):
+                            print("Error: Houve algum erro na geracao da tabela, refaca o processo de insercao")
+                    # except:
+                    #     print("Algum dado foi inserido da forma incorreta, refaca o processo")
+                    #     sleep(4)
             
                 case 6:
                     self.saveArchive()
-        
-    def avisoTabela(data):
-        avisodata = ""
-        
-        for i, dado in enumerate(data[1]):
-            avisodata += f"{i+1} - {dado}, "
-            
-        print(f"""Vale lembra que as colunas de dados são: {avisodata}""")
