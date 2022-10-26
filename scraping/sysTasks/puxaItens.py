@@ -21,7 +21,7 @@ def itens(WEB):
         rows= WEB.driver.find_elements(By.XPATH, "/html/body/div[@id='div_principal']/div[@id='div_principal']/div[@id='conteudo_template']/span[@id='conteudo']/div[@id='panelPesquisa']/div[@id='panelPesquisa_content']/form[@id='lista']/div/div/table/tbody/tr")
         for ix, row in enumerate(rows):
             if ((ix+1) % 500) == 0:
-                print("Extraindo item ", ix)
+                print("Extraindo item ", (i+1)*500)
             cels = row.find_elements(By.TAG_NAME, 'td')
             lista.append([cels[1].text, cels[2].text, cels[5].text])
 

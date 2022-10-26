@@ -1,4 +1,3 @@
-from ast import increment_lineno
 import openpyxl as opx
 from time import sleep
 
@@ -26,9 +25,10 @@ def avisoTabela(data):
             print(f"{i} - {dado}")
 
 class ExTable():
-    def __init__(self):
-        self.arquivo = opx.Workbook()
-        self.nome = None
+    def __init__(self, archive = False):
+        if archive == False: 
+            self.arquivo = opx.Workbook()
+            self.nome = None
         # self.arquivo.remove(self.arquivo.worksheets[0])
         
     def criaTabela(self, tnome):
@@ -44,25 +44,35 @@ class ExTable():
     def linhasTabela(self, i):
         tabela = self.arquivo[self.arquivo.sheetnames[i]]
         return tabela.max_row
+    
+    def colunasTabela(self, i):
+        tabela = self.arquivo[self.arquivo.sheetnames[i]]
+        return tabela.max_column
         
     
-    def addData(self, tabelaIx, columns, data, dataInner = False, condition = False):
-        # try: 
+    def addData(self, tabelaIx, columns, data, dataInner = False, condition = False, cab = False):
+        
+        try: 
             tabela = self.arquivo[self.arquivo.sheetnames[tabelaIx]]
+            
+            if cab == True:
+                cel = tabela.cell(row=(1), column=columns[0])
+                cel.value = data
+                return True
             
             if condition == False:
                 for ix, coluna in enumerate(columns):
-                    for dado in range(len(data)):
+                    for dado in range(1, len(data)):
                         cel = tabela.cell(row=(dado+1), column=coluna)
                         cel.value = data[dado][ix]
             
             else:
                 for dado in data:
                     procuro = str(dado[condition[0]])
-                    i = 1
+                    i = 2
                     while i <= tabela.max_row:
                         celBusca = tabela.cell(row=i, column = condition[1])
-                        #print(celBusca.value , procuro)
+                        # print(celBusca.value , procuro)
                         
                         if ( procuro == str(celBusca.value) ):
                             #if dataInner == False:
@@ -74,10 +84,10 @@ class ExTable():
                             i = tabela.max_row
                         
                         i += 1
-    
             return True
-        # except:
-        #     return False 
+        
+        except:
+            return False 
                     
             
     def saveArchive(self):
@@ -99,13 +109,13 @@ class ExTable():
                 
             optext +=f"""
                     \n
-                    [0] Voltar para extracao de dados
-                    [1] Mudar nome do arquivo
-                    [2] Criar tabela em {self.nome}.xlsx
-                    [3] Listar areas de trabalho existentes
-                    [4] Adicionar dados a uma tabela simples
-                    [5] Adicionar dados condicionais a uma tabela
-                    [6] Salvar Arquivo (finaliza modificacoes)
+                    [0] Voltar para extracao de dados;
+                    [1] Mudar nome do arquivo;
+                    [2] Criar tabela em {self.nome}.xlsx;
+                    [3] Listar areas de trabalho existentes;
+                    [4] Adicionar dados a uma tabela simples;
+                    [5] Adicionar dados condicionais a uma tabela;
+                    [6] Salvar Arquivo ( Possiblita vizualizar o mesmo antes de fechar a edicao ;-) );
                         
                     Rs:"""
             option = int(input(optext))
@@ -139,7 +149,7 @@ class ExTable():
                         
                     
                 case 5:
-                    # try:
+                    try:
                         tabelaIX = int(input("\nEscolha a tabela a ter dados inseridos: ").replace(" ", ""))
                         
                         avisoTabela(dataTable[0])
@@ -155,9 +165,9 @@ class ExTable():
                         
                         if(not ( self.addData( tabelaIx = tabelaIX, columns = columns, data = data, condition = conditions, dataInner = dataInner) ) ):
                             print("Error: Houve algum erro na geracao da tabela, refaca o processo de insercao")
-                    # except:
-                    #     print("Algum dado foi inserido da forma incorreta, refaca o processo")
-                    #     sleep(4)
+                    except:
+                        print("Algum dado foi inserido da forma incorreta, refaca o processo")
+                        sleep(4)
             
                 case 6:
                     self.saveArchive()

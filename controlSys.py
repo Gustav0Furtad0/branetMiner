@@ -3,12 +3,10 @@ import scraping.scraping as scraping
 
 from excel.table import ExTable
 
-# from control.listaCadItens import tableItens
-# from control.listaParamCatalog import tableCatalog
-
 driver = scraping.ChromeDriver()
 
-table = ExTable();
+table = ExTable()
+catCompleto = ExTable()
 
 def listaCadItens(op):
     result = driver.puxaItens()
@@ -29,3 +27,17 @@ def listaParamCatalog(op):
 def quit():
     del table
     driver.quitDriver(driver) 
+    
+def geraCatCompleto():
+    
+    driver.loginSistema()
+    
+    input("entra catalogo")
+    
+    result = driver.puxaItens()
+
+    catCompleto.addData( tabelaIx = 0, columns = [1,2,3], data = result)
+    
+    driver.geraCatalogoCompleto(catCompleto)
+    
+geraCatCompleto()

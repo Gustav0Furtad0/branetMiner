@@ -1,7 +1,8 @@
+from http.client import CONFLICT
 import controlSys
 
 while True:
-    if input("Faça login no sistema e tecle enter para continuar") == '':
+    if input("Faça login no sistema e tecle ENTER para continuar") == '':
         break
    
 while True: 
@@ -40,5 +41,11 @@ Rs:"""))
             else:
                 print("Pressiona somente a tecla ENTER")
         
+        case 3:
+            print("OBS: PARA EXTRAIR O CATALOGO DEVE HAVER O NOME DOS ITENS NA COLUNA 3 DA PLANILHA")
+            print("     SE NAO TIVER EXTRAIDO CTRL + C PARA FINALIZAR O PROGRAMA")
+            if input("Digite ENTER para continuar") == "":
+                controlSys.geraCatCompleto()
+        
         case _:
-            print ("!!! OPCAO INVALIDA !!! Tente novamente como umas das opcpes disponíveis!" )
+            print ("!!! OPCAO INVALIDA !!! Tente novamente como umas das opcoes disponiveis!" )
